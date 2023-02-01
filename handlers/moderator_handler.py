@@ -69,15 +69,15 @@ async def enter_link(message: types.Message, state: FSMContext):
 
 
 async def moderator_commands(message: types.Message):
-    if message.text.startswith('!!/help'):
-        await bot.send_message(message.from_user.id, "!!/print_films_list\n!!/del_post\n/upload")
-    if message.text.startswith('!!/print_films_list'):
+    if message.text.startswith('/help'):
+        await bot.send_message(message.from_user.id, "/print_films_list\n/del_post\n/upload")
+    if message.text.startswith('/print_films_list'):
         films_list = await db.get_films_list()
         for i in films_list:
             text = f"№ {i[0]}\n" + "Фильм: " + str(i[2]) + "\n" + "Фильм тут 👉" + str(i[3])
             await bot.send_photo(chat_id=message.chat.id, photo=i[1], caption=text)
 
-    elif message.text.startswith('!!/del_post'):
+    elif message.text.startswith('/del_post'):
         try:
             post = message.text.split(' ')
             post_id = post[-1]
@@ -91,4 +91,4 @@ def register_handlers_moderator(dp: Dispatcher):
 	dp.register_message_handler(load_photo, IsModerator(), content_types=["photo"], state=AdminPanel.photo)
 	dp.register_message_handler(enter_name, IsModerator(), content_types=["text"], state=AdminPanel.name)
 	dp.register_message_handler(enter_link, IsModerator(), content_types=["text"], state=AdminPanel.link)
-	dp.register_message_handler(moderator_commands, IsModerator(), content_types=["text"], text_startswith='!!/')
+	dp.register_message_handler(moderator_commands, IsModerator(), content_types=["text"], text_startswith='/')

@@ -16,5 +16,10 @@ create table if not exists bot_users
     subscribe bool default FALSE
 );
 
+create table if not exists partners_links
+(
+    link text UNIQUE
+);
+
 
 

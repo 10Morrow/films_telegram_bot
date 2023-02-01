@@ -8,9 +8,9 @@ host = env.str("host")
 
 port = env.str("port")
 
-user = env.str("user")
+user = env.str("PG_USER")
 
-password = env.str("password")
+password = env.str("PG_PASS")
 
 database_name = env.str("database_name")
 

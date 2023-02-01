@@ -19,9 +19,9 @@ async def on_shutdown(dp):
 
 
 filters.setup(dp)
+client_handler.register_handlers_clients(dp)
 admin_handler.register_handlers_admin(dp)
 moderator_handler.register_handlers_moderator(dp)
-client_handler.register_handlers_clients(dp)
 
 
 if __name__ == "__main__":

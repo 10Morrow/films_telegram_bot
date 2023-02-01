@@ -6,3 +6,7 @@ db = DataBase()
 class SubClient(BoundFilter):
     async def check(self, message: types.Message) -> bool:
         return await db.user_subscribed(message.from_user.id)
+
+class NotCommand(BoundFilter):
+    async def check(self, message: types.Message) -> bool:
+        return not message.text.startswith('/')

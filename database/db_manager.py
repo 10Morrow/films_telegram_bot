@@ -36,6 +36,16 @@ class DataBase:
 
 	GET_USERS = "SELECT subscribe FROM bot_users"
 
+	ADD_NEW_LINK = "INSERT INTO partners_links(link) VALUES ($1)"
+
+	GET_LINKS = "SELECT link FROM partners_links"
+
+	DEL_LINK = "DELETE FROM partners_links WHERE link = $1"
+
+	UPDATE_STATUS = "UPDATE $1 SET status=$2, description=$3 WHERE user_id=$4"
+
+	CREATE_TABLE = "CREATE TABLE $1 (user_id bigint NOT NULL, status text, description text, PRIMARY KEY (user_id))"
+
 	async def add_new_user(self, user_id):
 		try:
 			await self.pool.fetchval(self.ADD_NEW_USER, user_id)
@@ -109,3 +119,47 @@ class DataBase:
 				false_user += 1
 		result_text = f"Subscribed users : {true_user}\nUnsubscribed users : {false_user}"
 		return result_text
+
+	async def add_new_link(self, link):
+		try:
+			await self.pool.fetchval(self.ADD_NEW_LINK, link)
+		except UniqueViolationError:
+			pass
+
+	async def get_links(self):
+		result = await self.pool.fetch(self.GET_LINKS)
+		return result
+
+	async def del_link(self, link):
+		try:
+			await self.pool.fetchval(self.DEL_LINK, link)
+		except UniqueViolationError:
+			pass
+
+	async def check_table(self, name_camp):
+		CHECK_TABLE = f"""SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = '{name_camp}');"""
+		result = await self.pool.fetchval(CHECK_TABLE)
+		return bool(result)
+
+	async def create_table(self, name_camp):
+		print(name_camp)
+		CREATE_TABLE = f"CREATE TABLE {name_camp} (user_id bigint NOT NULL, status text, description text, PRIMARY KEY (user_id));"
+		INSERT_DATA = f"INSERT INTO {name_camp} (user_id, status, description) SELECT user_id, 'waiting', null FROM bot_users;"
+		try:
+			await self.pool.execute(CREATE_TABLE)
+			await self.pool.execute(INSERT_DATA)
+		except UniqueViolationError:
+			pass
+
+	async def delete_table(self, name_camp):
+		DROP_TABLE = f"DROP TABLE {name_camp}"
+		await self.pool.fetchval(DROP_TABLE)
+
+	async def get_user_list(self, name_camp):
+		GET_USERS_LIST = f"SELECT user_id FROM {name_camp} WHERE status = 'waiting'"
+		result = await self.pool.fetch(GET_USERS_LIST)
+		return result
+
+	async def update_status(self, table_name, user_id, status, description):
+		UPDATE_STATUS = f"UPDATE {table_name} SET status='{status}', description='{description}' WHERE user_id={user_id}"
+		await self.pool.fetchval(UPDATE_STATUS)
